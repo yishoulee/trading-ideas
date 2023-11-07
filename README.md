@@ -1,6 +1,6 @@
 # Trading Notebook from Scratch
 
-Some of my early algorithmic trading demonstration using technical indicators, which highlights my ability to optimize trading signals by utilizing technical indicators such as Bollinger Bands and Stochastic Oscillator. My objective is to simulate cumulative returns from the most recent historical data of Ethereum and USD Tether.
+Some of my early algorithmic trading demonstration using technical indicators from quite some time ago, which highlights my ability to optimize trading signals by utilizing technical indicators such as Bollinger Bands and Stochastic Oscillator. My objective is to simulate cumulative returns from the most recent historical data of Ethereum and USD.
 
 ## Small project was executed using Jupyter Notebooks, and is comprised of the following steps:
 
