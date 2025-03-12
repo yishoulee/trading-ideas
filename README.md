@@ -94,7 +94,7 @@ pip install pandas numpy yfinance requests beautifulsoup4 lxml matplotlib
 
 2. **Execute the Script:**
    ```bash
-   python backtest.py
+   python factor_investing_backtesting_momentum_only.py
    ```
 
 3. **Outputs:**
