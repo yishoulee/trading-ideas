@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Debug: show python info
+  - name: "Debug: show python info"
         run: |
           python --version || true
           which python || true
