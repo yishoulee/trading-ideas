@@ -1,0 +1,45 @@
+# Environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Coverage & reports
+.coverage
+htmlcov/
+coverage.xml
+
+# Type checker
+.mypy_cache/
+.pytype/
+
+# Lint caches
+.ruff_cache/
+
+# Notebooks artifacts
+*.nbconvert.ipynb
+
+# Data / cache
+cache/
+*.parquet
+*.feather
+*.csv.gz
+
+# Logs
+logs/
+*.log
+
+# Packaging
+*.egg-info/
+build/
+dist/
+
+# IDE
+.vscode/
+.DS_Store
+
+# Local environment overrides
+.env
+.env.*
+.python-version

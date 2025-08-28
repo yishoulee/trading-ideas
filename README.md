@@ -1,34 +1,52 @@
-# Trading Notebook from Scratch
+# Trading Ideas (Unified)
 
-Some of my early algorithmic trading demonstration using technical indicators from quite some time ago, which highlights my ability to optimize trading signals by utilizing technical indicators such as Bollinger Bands and Stochastic Oscillator. My objective is to simulate cumulative returns from the most recent historical data of Ethereum and USD.
+A consolidated collection of my early algorithmic / quantitative trading explorations (Bollinger Bands, Stochastic Oscillator, ETF momentum, sector statistical arbitrage) refactored into a coherent, minimal, and testable Python package plus research notebooks.
 
-## Small project was executed using Jupyter Notebooks, and is comprised of the following steps:
+## Repo Layout
 
-Trading Ideas - My work focused on simulating trading ideas from scratch. Specifically, I performed data analysis and employed technical indicators, including the tuning of the window sizes of technical indicators. I also created a simple order book to execute buy and sell orders using FIFO serving.
-I have included the virtualenv requirements for the Python environment to make it easier to replicate my work.
+```
+trading_ideas/              # Reusable library code (indicators, backtests, utils)
+  indicators/               # Technical indicator functions
+  backtest/                 # Simple backtesting engines
+  data/                     # (Optional) local static data samples
+strategies/                 # Strategy research notebooks (exploratory)
+engines/                    # Legacy / prototype scripts
+requirements.txt            # Minimal runtime + test deps
+pyproject.toml              # Packaging metadata
+```
 
+## Quick Start
 
-### Stochastic Oscillator
+1. Create environment & install deps:
+```
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .  # optional if packaging later
+```
+2. Run tests:
+```
+pytest -q
+```
+3. Open the notebooks in `strategies/` for exploratory analysis. Logic formerly in the removed legacy notebook has been modularized into the package modules.
 
-![my image](https://github.com/ianlee3/trading-ideas/blob/main/Figures/1.png)
+## Indicators Implemented
+- Bollinger Bands (`bollinger_bands`)
+- Stochastic Oscillator (`stochastic_oscillator`)
 
-### Bollinger Bands
+## Backtesting
+`SimpleFIFOBacktester` offers a light position management loop (FIFO close, fraction-of-cash sizing) for fast prototyping. Signals are integers: -1 buy, +1 sell, 0 hold. Extend or replace for more realism (slippage, fees, latency, risk limits).
 
-![my image](https://github.com/ianlee3/trading-ideas/blob/main/Figures/2.png)
+## Next Improvements
+- Shift signals by one bar to avoid look-ahead bias.
+- Add performance metrics (returns, drawdown, Sharpe proxy, win rate).
+- Parameter sweep utilities & walk-forward validation.
+- Data acquisition layer with provenance + schema validation.
+- Vectorized position accounting & transaction cost modeling.
+- Packaging (`pyproject.toml`) and CI workflow (lint, tests).
 
+## Data
+`ETH-USD.csv` is sample historical data (source: Yahoo Finance). Add multiple assets / asset classes as needed; store only *small* slices for examples.
 
-### Summary
-The results of this project demonstrate promising outcomes, as both the stochastic oscillator and my trading signal generated capital gains.
-
-## Limitations and Future Work
-
-As an early prototyping the trading idea, the work was treated as a data analysis project mainly worked in jupyter notebooks. the code in this project needs to be cleaned up and reorganized to ensure modularity.
-
-It's important to note that this project does not yet incorporate alpha signals, financial risk management, or portfolio optimization. As such, my future work will focus on developing a comprehensive and wholistic multi-strategy trading system that includes the following design elements:
-1. Robust data acquisition and vetting, with supplementary statistics to fill any missing data.
-2. System architecture design and version tracking.
-3. Backtesting and alpha analysis to optimize the portfolio.
-4. Integration with brokerages and order submission capabilities.
-5. Portfolio allocation and analysis to better understand performance.
-
-By implementing these steps, I will build a sophisticated trading system that can generate higher returns while managing risk effectively.
+## Disclaimer
+Educational / research prototype only. Not investment advice.
