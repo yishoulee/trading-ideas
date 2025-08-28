@@ -2,6 +2,8 @@
 
 Modular quantitative research toolkit: indicators, backtesting primitives, momentum & statistical arbitrage strategies, factor engine, and performance analytics—packaged with tests for reproducibility.
 
+This repository sums up and consolidates my previous trading research projects (ETF momentum, sector stat arb, factor experiments, and associated notebooks) into one organized, reusable codebase.
+
 ## Current Features
 
 | Area | Modules | Highlights |
@@ -13,20 +15,19 @@ Modular quantitative research toolkit: indicators, backtesting primitives, momen
 | Performance | `analytics/performance.py` | Sharpe, CAGR, Max Drawdown, Turnover, summary helper |
 | Data | `data/sp500.py` | S&P 500 constituents + price download/cache |
 
-## Repository Layout (flattened src/)
+## Repository Layout (packages at repo root)
 ```
-src/
-  analytics/        # Performance metrics
-  backtest/         # Backtesting engines
-  data/             # Universe & price helpers
-  factors/          # Factor computations & combiners
-  engines/          # Portfolio engines (factor)
-  indicators/       # Technical indicators
-  strategies/       # Strategy implementations
-tests/              # Pytest suite
-Makefile            # Common dev tasks
-pyproject.toml      # Packaging metadata
-requirements.txt    # Base deps (optional, pyproject is canonical)
+analytics/        # Performance metrics
+backtest/         # Backtesting engines
+data/             # Universe & price helpers
+factors/          # Factor computations & combiners
+engines/          # Portfolio engines (factor)
+indicators/       # Technical indicators
+strategies/       # Strategy implementations
+tests/            # Pytest suite
+Makefile          # Common dev tasks
+pyproject.toml    # Packaging metadata
+requirements.txt  # Base deps (optional, pyproject is canonical)
 ```
 
 ## Installation

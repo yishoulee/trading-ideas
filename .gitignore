@@ -26,6 +26,16 @@ cache/
 *.feather
 *.csv.gz
 
+# Figures, data folders and datasets
+Figures/
+data/
+data_raw/
+datasets/
+
+# Database files
+*.sqlite3
+*.db
+
 # Logs
 logs/
 *.log
@@ -35,11 +45,28 @@ logs/
 build/
 dist/
 
+# pip build metadata
+pip-wheel-metadata/
+
 # IDE
 .vscode/
 .DS_Store
+.idea/
 
 # Local environment overrides
 .env
 .env.*
 .python-version
+
+# Test and CI artifacts
+.pytest_cache/
+reports/
+reports/*.xml
+artifacts/
+
+# Secrets and keys
+*.pem
+*.key
+*.secret
+secrets.json
+credentials.json
