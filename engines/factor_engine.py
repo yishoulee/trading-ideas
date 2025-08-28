@@ -3,7 +3,14 @@ import pandas as pd
 import numpy as np
 from dataclasses import dataclass, field
 from typing import Dict, Callable, List, Any
-from factors import momentum_factor, volatility_factor, composite_rank
+from factors import (
+    momentum_factor,
+    volatility_factor,
+    value_factor,
+    quality_factor,
+    size_factor,
+    composite_rank,
+)
 from analytics.performance import summarize_performance
 
 FactorFunc = Callable[[pd.DataFrame], pd.Series]
@@ -11,6 +18,9 @@ FactorFunc = Callable[[pd.DataFrame], pd.Series]
 DEFAULT_FACTORS: Dict[str, FactorFunc] = {
     'momentum': lambda px: momentum_factor(px, lookback=126),
     'low_vol': lambda px: volatility_factor(px, lookback=126),
+    'value': lambda px: value_factor(px),
+    'quality': lambda px: quality_factor(px),
+    'size': lambda px: size_factor(px),
 }
 
 @dataclass
@@ -45,12 +55,15 @@ class FactorPortfolioEngine:
                 continue
             factor_scores = {name: f(window_px) for name, f in self.factor_funcs.items() if name in self.config.weights}
             composite = composite_rank(factor_scores, self.config.weights)
+            # basic attribution: store z-scored weighted components for long list
+            attribution = None
             if composite.empty:
                 continue
             longs = composite.head(self.config.top_n).index.tolist()
             shorts: List[str] = []
             if self.config.long_short and self.config.short_fraction > 0:
                 shorts = composite.tail(self.config.top_n).index.tolist()
+            # equal weight sizing (placeholder for future risk parity / volatility targeting)
             target_long_notional = capital
             target_short_notional = capital * self.config.short_fraction if shorts else 0
             per_long = target_long_notional / len(longs) if longs else 0
