@@ -27,6 +27,7 @@ class PairStatArb:
     lookback: int = 60
     entry_z: float = 2.0
     exit_z: float = 0.5
+    initial_capital: float = 1.0
 
     def generate_signals(self, prices: pd.DataFrame) -> pd.DataFrame:
         """Generate z-score, entry/exit signals and discrete positions for a pair.
@@ -70,11 +71,27 @@ class PairStatArb:
         x = prices[self.x_symbol]
         y = prices[self.y_symbol]
         beta = hedge_ratio(y, x)
+
         # daily pnl approximate: position_{t-1} * change in spread_t
         spread = sigs['spread']
         spread_ret = spread.diff().fillna(0)
-        sigs['pnl'] = sigs['position'].shift(1).fillna(0) * (-spread_ret)  # negative because long spread profits when spread narrows
+        raw_pnl = sigs['position'].shift(1).fillna(0) * (-spread_ret)  # negative because long spread profits when spread narrows
+        sigs['pnl'] = raw_pnl
+
+        # Keep legacy equity as cumulative P&L (preserves previous behavior/tests)
         sigs['equity'] = sigs['pnl'].cumsum()
+
+        # Compute normalized NAV for demo/analysis: estimate returns using notional
+        prev_y = y.shift(1)
+        prev_x = x.shift(1)
+        notional = (prev_y.abs() + (abs(beta) * prev_x.abs())).fillna(0)
+        returns = pd.Series(0.0, index=sigs.index)
+        mask = notional > 0
+        returns.loc[mask] = raw_pnl.loc[mask] / notional.loc[mask]
+        nav = (1.0 + returns).cumprod() * float(self.initial_capital)
+        sigs['returns'] = returns
+        sigs['nav'] = nav
+
         if len(sigs) > 0:
             cummax = sigs['equity'].cummax()
             sigs['drawdown'] = sigs['equity'] / cummax - 1

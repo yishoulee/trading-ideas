@@ -4,20 +4,62 @@ import numpy as np
 
 TRADING_DAYS = 252
 
+
+def _infer_periods_per_year(index: pd.Index) -> int:
+    """Infer the number of periods per year from an index of timestamps.
+
+    Uses the median delta in days between consecutive points and maps to an
+    integer periods-per-year. Falls back to TRADING_DAYS when inference fails.
+    """
+    if index is None or len(index) < 2:
+        return TRADING_DAYS
+    # Compute median delta in days
+    try:
+        dt_index = pd.DatetimeIndex(index)
+        deltas = dt_index.to_series().diff().dropna().dt.days
+    except Exception:
+        return TRADING_DAYS
+    if deltas.empty:
+        return TRADING_DAYS
+    med = float(deltas.median())
+    if med <= 0:
+        return TRADING_DAYS
+    periods = int(round(365.25 / med))
+    # sanity bounds
+    if periods < 1:
+        return TRADING_DAYS
+    if periods > 365:
+        return TRADING_DAYS
+    return periods
+
+
 def sharpe_ratio(returns: pd.Series, risk_free: float = 0.0) -> float:
     """Compute annualized Sharpe ratio from periodic returns.
 
+    This function infers the periodicity of `returns` from its index. If the
+    index spacing looks monthly, weekly, or daily, the annualization factor is
+    adjusted accordingly (sqrt(12), sqrt(52), sqrt(252), etc.).
+
     Parameters
-    - returns: pandas Series of periodic returns (daily).
+    - returns: pandas Series of periodic returns with a DatetimeIndex (preferred).
     - risk_free: annual risk-free rate.
 
     Returns annualized Sharpe (float). Returns 0.0 for degenerate inputs.
     """
-    excess = returns - risk_free / TRADING_DAYS
+    if returns is None or returns.empty:
+        return 0.0
+    # infer periods per year from the index if possible
+    try:
+        ppy = _infer_periods_per_year(returns.index)
+    except Exception:
+        ppy = TRADING_DAYS
+
+    # convert annual risk-free to per-period
+    excess = returns - risk_free / ppy
     vol = excess.std(ddof=0)
     if vol == 0 or np.isnan(vol):
         return 0.0
-    return np.sqrt(TRADING_DAYS) * excess.mean() / vol
+    return np.sqrt(ppy) * excess.mean() / vol
 
 
 def cagr(equity: pd.Series) -> float:

@@ -99,3 +99,50 @@ No bundled CSV datasets. Use the `data.sp500` module to fetch S&P 500 constituen
 
 ## Disclaimer
 Educational research code. Not investment advice.
+
+## Demo (run with real market data)
+
+Several demo scripts live under the `scripts/` folder and fetch real adjusted prices using `yfinance`.
+
+Makefile helpers:
+
+- Run a single demo:
+    ```bash
+    make demo SCRIPT=scripts/demo_factor_model.py ARGS="--tickers AAPL MSFT AMZN NVDA --start 2023-01-01 --end 2024-01-01"
+    ```
+
+- Run all demos (may take time and requires network access):
+    ```bash
+    make demo-all
+    ```
+
+- Open the artifacts folder with your platform opener (Linux example):
+    ```bash
+    make demo-open
+    ```
+
+Artifacts are saved in the `scripts/` directory, e.g.:
+
+- `scripts/demo_equity.png` — simple FIFO backtest equity
+- `scripts/demo_statarb_equity.png` — pair statarb equity
+- `scripts/demo_momentum_equity.png` — monthly momentum equity
+- `scripts/demo_etf_momentum_equity.png` — ETF momentum equity
+- `scripts/demo_factors.csv` / `scripts/demo_factors.png` / `scripts/demo_factors_equity.png` — factor ranks and backtest equity
+
+Sample output (factor demo):
+
+```
+Saved /path/to/repo/scripts/demo_factors.csv and /path/to/repo/scripts/demo_factors.png
+Top tickers:
+Ticker
+AMZN    0.864152
+NVDA    0.669182
+MSFT    0.136073
+AAPL   -1.669407
+dtype: float64
+Saved backtest equity to /path/to/repo/scripts/demo_factors_equity.png
+```
+
+Notes:
+- All demos require `yfinance` to be installed in your environment. Install extras via `pip install -e .[web]` or `pip install yfinance`.
+- The demos use adjusted close prices and a simple rebalancing/backtest logic for demonstration only — treat results as illustrative.

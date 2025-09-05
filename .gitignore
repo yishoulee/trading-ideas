@@ -31,6 +31,11 @@ Figures/
 data_raw/
 datasets/
 
+# Demo artifacts
+scripts/demo_*.png
+scripts/demo_*.csv
+
+
 # Database files
 *.sqlite3
 *.db

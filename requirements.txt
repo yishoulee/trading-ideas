@@ -2,3 +2,13 @@ pandas==2.1.2
 numpy==1.26.1
 matplotlib==3.8.1
 pytest==7.4.2
+
+# Demo and data fetching
+yfinance>=0.2.27
+requests>=2.31.0
+beautifulsoup4>=4.12.2
+lxml>=4.9.3
+
+# Notebooks / reproducibility
+notebook>=6.5.4
+nbformat>=5.9.0
