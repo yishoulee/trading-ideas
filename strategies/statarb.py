@@ -4,9 +4,14 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, Dict, Any, List
 
+from utils import zscore as _zscore
+
 
 def hedge_ratio(y: pd.Series, x: pd.Series) -> float:
-    # simple OLS beta without intercept
+    """Estimate simple hedge ratio (beta) of y ~ x without intercept.
+
+    Returns the slope estimate from OLS constrained through the origin.
+    """
     valid = y.notna() & x.notna()
     xv = x[valid]
     yv = y[valid]
@@ -14,12 +19,6 @@ def hedge_ratio(y: pd.Series, x: pd.Series) -> float:
         return np.nan
     beta = (xv * yv).sum() / (xv * xv).sum()
     return beta
-
-
-def zscore(series: pd.Series, window: int) -> pd.Series:
-    rolling_mean = series.rolling(window).mean()
-    rolling_std = series.rolling(window).std(ddof=0)
-    return (series - rolling_mean) / rolling_std
 
 @dataclass
 class PairStatArb:
@@ -30,11 +29,15 @@ class PairStatArb:
     exit_z: float = 0.5
 
     def generate_signals(self, prices: pd.DataFrame) -> pd.DataFrame:
+        """Generate z-score, entry/exit signals and discrete positions for a pair.
+
+        Returns a DataFrame with columns: spread, zscore, position (integer -1/0/1).
+        """
         x = prices[self.x_symbol]
         y = prices[self.y_symbol]
         beta = hedge_ratio(y, x)
         spread = y - beta * x
-        z = zscore(spread, self.lookback)
+        z = _zscore(spread, window=self.lookback)
         long_entry = (z < -self.entry_z).astype(int)
         short_entry = (z > self.entry_z).astype(int)
         exit_sig = (z.abs() < self.exit_z).astype(int)
@@ -59,6 +62,10 @@ class PairStatArb:
         return out
 
     def backtest(self, prices: pd.DataFrame) -> pd.DataFrame:
+        """Run a simple backtest: position_{t-1} * change in spread_t as daily P&L.
+
+        Returns a DataFrame with columns: spread, zscore, position, pnl, equity, drawdown.
+        """
         sigs = self.generate_signals(prices)
         x = prices[self.x_symbol]
         y = prices[self.y_symbol]
@@ -70,5 +77,5 @@ class PairStatArb:
         sigs['equity'] = sigs['pnl'].cumsum()
         if len(sigs) > 0:
             cummax = sigs['equity'].cummax()
-            sigs['drawdown'] = sigs['equity']/cummax - 1
+            sigs['drawdown'] = sigs['equity'] / cummax - 1
         return sigs

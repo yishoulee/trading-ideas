@@ -5,8 +5,13 @@ import numpy as np
 # For demo we use average price (lower price treated as smaller size => size factor returns negative avg price so large negative = large cap)
 
 def size_factor(prices: pd.DataFrame) -> pd.Series:
+    """Size factor proxy: negative average price over recent window.
+
+    This is a placeholder: lower average price is treated as smaller size and
+    therefore receives a higher factor (more negative value -> higher rank).
+    """
     avg_price = prices.tail(63).mean() if prices.shape[0] >= 63 else prices.mean()
-    # Return negative so that smaller average price => higher factor (treating small-cap preference) 
+    # Return negative so that smaller average price => higher factor (treating small-cap preference)
     return (-avg_price).replace([np.inf, -np.inf], np.nan)
 
 __all__ = ['size_factor']

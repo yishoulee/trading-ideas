@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple
-from .statarb import hedge_ratio, zscore
+from .statarb import hedge_ratio
+from utils import zscore as _zscore
 from analytics.performance import summarize_performance
 
 @dataclass
@@ -13,12 +14,25 @@ class PairDefinition:
     lookback: int = 60
     entry_z: float = 2.0
     exit_z: float = 0.5
+    """Lightweight container defining a single pair to trade.
+
+    Attributes
+    - x, y: ticker symbols for the pair (x is the hedge leg, y is the asset leg).
+    - lookback: rolling window for z-score
+    - entry_z, exit_z: z-score thresholds for entry/exit
+    """
 
 @dataclass
 class MultiPairStatArb:
     pairs: List[PairDefinition]
     capital: float = 100_000
     per_pair_capital: float | None = None
+    """Run multiple pair stat-arb strategies and aggregate results.
+
+    The class orchestrates running `_run_pair` per pair, scaling equity by
+    `per_pair_capital` (or equal split of `capital`) and returns portfolio
+    level equity, per-pair results, and a combined performance dict.
+    """
 
     def run(self, prices: pd.DataFrame) -> Dict[str, Any]:
         equity = 0.0
@@ -60,7 +74,7 @@ class MultiPairStatArb:
         y = prices[p.y]
         beta = hedge_ratio(y, x)
         spread = y - beta * x
-        z = zscore(spread, p.lookback)
+        z = _zscore(spread, window=p.lookback)
         long_entry = z < -p.entry_z
         short_entry = z > p.entry_z
         exit_sig = z.abs() < p.exit_z

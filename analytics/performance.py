@@ -5,6 +5,14 @@ import numpy as np
 TRADING_DAYS = 252
 
 def sharpe_ratio(returns: pd.Series, risk_free: float = 0.0) -> float:
+    """Compute annualized Sharpe ratio from periodic returns.
+
+    Parameters
+    - returns: pandas Series of periodic returns (daily).
+    - risk_free: annual risk-free rate.
+
+    Returns annualized Sharpe (float). Returns 0.0 for degenerate inputs.
+    """
     excess = returns - risk_free / TRADING_DAYS
     vol = excess.std(ddof=0)
     if vol == 0 or np.isnan(vol):
@@ -13,6 +21,10 @@ def sharpe_ratio(returns: pd.Series, risk_free: float = 0.0) -> float:
 
 
 def cagr(equity: pd.Series) -> float:
+    """Compute compound annual growth rate (CAGR) for an equity series.
+
+    Returns 0.0 for empty or non-positive equity series.
+    """
     if equity.empty:
         return 0.0
     start = equity.iloc[0]
@@ -26,6 +38,10 @@ def cagr(equity: pd.Series) -> float:
 
 
 def max_drawdown(equity: pd.Series) -> float:
+    """Return the maximum drawdown (most negative peak-to-trough decline).
+
+    Returns 0.0 for empty series.
+    """
     if equity.empty:
         return 0.0
     roll_max = equity.cummax()
@@ -35,8 +51,10 @@ def max_drawdown(equity: pd.Series) -> float:
 
 def turnover(trades: pd.DataFrame, equity_series: pd.Series | None = None) -> float:
     """Approximate annualized turnover.
-    trades: columns expected ['date','notional'] with positive buys & sells absolute notionals.
-    equity_series: portfolio equity to scale notionals; if missing, use sum notionals / last equity.
+
+    Parameters
+    - trades: DataFrame with columns ['date','notional'] where notional is signed trade size.
+    - equity_series: optional equity series used to scale daily notionals.
     """
     if trades.empty:
         return 0.0

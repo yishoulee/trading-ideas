@@ -4,6 +4,10 @@ import numpy as np
 # Placeholder quality factor: stability of returns (lower volatility => higher quality)
 # Implemented as negative rolling std of returns across last 63 trading days (~quarter)
 def quality_factor(prices: pd.DataFrame, lookback: int = 63) -> pd.Series:
+    """Quality factor proxy: negative realized volatility over `lookback` days.
+
+    Lower volatility yields a higher quality score (we return negative vol).
+    """
     if prices.shape[0] < lookback + 2:
         lookback = prices.shape[0] - 2
     rets = prices.pct_change().iloc[-lookback:]

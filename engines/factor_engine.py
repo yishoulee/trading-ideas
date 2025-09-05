@@ -30,12 +30,28 @@ class FactorConfig:
     rebalance_freq: str = 'M'  # monthly end
     long_short: bool = False
     short_fraction: float = 0.0  # fraction of long notional to allocate to shorts
+    """Configuration for a factor-based portfolio.
+
+    Attributes
+    - weights: mapping of factor name to weight used when combining factor scores.
+    - top_n: number of assets to select for longs/shorts.
+    - rebalance_freq: pandas resample rule string (e.g., 'M' for monthly).
+    - long_short: whether to construct symmetric long/short positions.
+    - short_fraction: fraction of long notional to allocate to shorts when `long_short` is True.
+    """
 
 @dataclass
 class FactorPortfolioEngine:
     factor_funcs: Dict[str, FactorFunc] = field(default_factory=lambda: DEFAULT_FACTORS)
     config: FactorConfig = field(default_factory=lambda: FactorConfig(weights={'momentum':0.6,'low_vol':0.4}))
     initial_capital: float = 1_000_000
+    """A lightweight factor portfolio engine used in examples and tests.
+
+    The engine is intentionally simple: it evaluates configured factor
+    functions on historical prices, forms a composite ranking using
+    `factors.composite_rank`, sizes equally across selected names, and
+    simulates mark-to-market equity between rebalances.
+    """
 
     def run(self, prices: pd.DataFrame) -> Dict[str, Any]:
         prices = prices.sort_index()
