@@ -28,7 +28,6 @@ cache/
 
 # Figures, data folders and datasets
 Figures/
-data/
 data_raw/
 datasets/
 
